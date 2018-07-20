@@ -1,8 +1,23 @@
 SQL Social-Network Modification
 
-1. DELETE FROM Highschooler
+Tables:
+
+Highschooler ( ID, name, grade ) 
+English: There is a high school student with unique ID and a given first name in a certain grade. 
+
+Friend ( ID1, ID2 ) 
+English: The student with ID1 is friends with the student with ID2. Friendship is mutual, so if (123, 456) is in the Friend table, so is (456, 123). 
+
+Likes ( ID1, ID2 ) 
+English: The student with ID1 likes the student with ID2. Liking someone is not necessarily mutual, so if (123, 456) is in the Likes table, there is no guarantee that (456, 123) is also present. 
+
+1. It's time for the seniors to graduate. Remove all 12th graders from Highschooler. 
+
+   DELETE FROM Highschooler
    WHERE grade = 12
 
-2. DELETE FROM Likes where ID1 in (SELECT F1.ID1 FROM Friend F1, Likes L1 
+2. If two students A and B are friends, and A likes B but not vice-versa, remove the Likes tuple. 
+
+   DELETE FROM Likes where ID1 in (SELECT F1.ID1 FROM Friend F1, Likes L1 
    WHERE F1.ID1 = L1.ID1 AND F1.ID2 = L1.ID2 AND F1.ID2 NOT IN
    (SELECT ID1 FROM Likes WHERE ID2 = F1.ID1))
