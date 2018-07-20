@@ -1,0 +1,83 @@
+SQL Movie-Rating Query Exercises Extras
+
+1. SELECT Reviewer.name
+    FROM Reviewer
+   WHERE Reviewer.rID IN (SELECT Rating.rID
+   FROM Rating
+   WHERE Rating.mID = 101)
+
+2. SELECT Reviewer.name, Movie.title, Rating.stars
+   FROM Reviewer, Movie, Rating,
+   (SELECT rID,mID,stars
+   FROM Rating WHERE Rating.rID IN 
+   (SELECT distinct rID FROM Reviewer, Movie WHERE Reviewer.name = Movie.director)) as comp
+   WHERE Reviewer.rID = comp.rID and Movie.mID = comp.mID and Rating.stars = comp.stars
+   GROUP BY 1
+
+3. SELECT name FROM Reviewer
+    UNION
+    SELECT title FROM Movie
+
+4. SELECT title FROM Movie 
+    WHERE mID NOT IN (SELECT mID FROM Rating WHERE rID = 205)
+
+5. SELECT DISTINCT r1.name AS n1, r2.name AS n2 FROM
+    (SELECT r1.rID AS id1, r2.rID AS id2 FROM Rating r1, Rating r2 
+    WHERE r1.rID > r2.rID AND r1.mID = r2.mID) AS t, Reviewer r1, Reviewer r2
+    WHERE r1.rID = t.id1 AND r2.rID = t.id2 
+    ORDER BY 1,2
+
+6. SELECT Reviewer.name, Movie.title, comp.stars
+    FROM Reviewer, Movie, Rating,
+    (SELECT rID, mID, stars
+    FROM Rating 
+    WHERE stars IS(SELECT MIN(stars) FROM Rating)) as comp
+    WHERE comp.rID = Reviewer.rID and Movie.mID = comp.mID and Rating.stars = comp.stars
+    GROUP BY 2
+
+7. SELECT Movie.title, AVG(Rating.stars) 
+    FROM Rating
+    JOIN Movie
+    ON Movie.mID = Rating.mID
+    GROUP BY 1
+    ORDER BY 2 DESC, 1
+
+8. SELECT name FROM Reviewer
+   JOIN (SELECT rID,  CASE WHEN COUNT(rID) >= 3 THEN 'yes' END AS counter
+   FROM Rating GROUP BY 1) as comp
+   ON Reviewer.rID = comp.rID
+   WHERE comp.counter = 'yes'
+
+9. SELECT title, Movie.director
+   FROM  Movie JOIN (SELECT director,
+   CASE WHEN COUNT(director) >= 2 THEN 'yes' ELSE 'no' END AS counter 
+   FROM Movie GROUP BY 1) yes
+   ON Movie.director = yes.director
+   WHERE yes.counter = 'yes'
+   GROUP BY 1
+   ORDER BY 2
+
+10. SELECT m.title, AVG(r.stars) AS avg_r
+    FROM Movie m, Rating r
+    WHERE m.mID = r.mID
+    GROUP BY 1
+    HAVING avg_r = 
+    (SELECT MAX(rate) FROM (SELECT m.title, AVG(r.stars) AS rate FROM Movie m, Rating r
+    WHERE m.mID = r.mID
+    GROUP BY 1)
+
+11. SELECT m.title, AVG(r.stars) AS avg_r
+    FROM Movie m, Rating r
+    WHERE m.mID = r.mID
+    GROUP BY 1
+    HAVING avg_r = 
+    (SELECT MIN(rate) FROM (SELECT m.title, AVG(r.stars) AS rate FROM Movie m, Rating r
+    WHERE m.mID = r.mID
+    GROUP BY 1)
+
+12. SELECT director, title, R.star
+    FROM Movie JOIN (SELECT mID, MAX(stars) as star FROM Rating GROUP BY mID) R
+    ON Movie.mID = R.mID
+    WHERE Movie.director IS NOT NULL
+    GROUP BY 1
+    ORDER BY 1

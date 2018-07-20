@@ -1,0 +1,8 @@
+SQL Social-Network Modification
+
+1. DELETE FROM Highschooler
+   WHERE grade = 12
+
+2. DELETE FROM Likes where ID1 in (SELECT F1.ID1 FROM Friend F1, Likes L1 
+   WHERE F1.ID1 = L1.ID1 AND F1.ID2 = L1.ID2 AND F1.ID2 NOT IN
+   (SELECT ID1 FROM Likes WHERE ID2 = F1.ID1))

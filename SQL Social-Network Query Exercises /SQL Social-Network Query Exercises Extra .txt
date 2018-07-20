@@ -1,0 +1,22 @@
+SQL Social-Network Query Exercises Extra
+
+1. SELECT H1.name, H1.grade, H2.name, H2.grade, H3.name, H3.grade
+   FROM Highschooler H1, Highschooler H2, Highschooler H3,(SELECT L1.ID1 as c1, L2.ID1, L2.ID2
+   FROM Likes L1, Likes L2 WHERE L1.ID2 = L2.ID1 and L1.ID1 <> L2.ID2) list
+   WHERE H1.ID = list.c1 and H2.ID = list.ID1 and H3.ID = list.ID2
+
+2. SELECT name, grade FROM Highschooler, (SELECT ID FROM Highschooler 
+   WHERE ID NOT IN (SELECT distinct   H1.ID FROM Highschooler H1, Highschooler H2, Friend F1
+   WHERE F1.ID1 = H1.ID and F1.ID2 = H2.ID and H1.grade = H2.grade)) list
+   WHERE Highschooler.ID = list.ID
+
+3. SELECT AVG(counter) FROM (SELECT ID1, COUNT(ID1) as counter FROM Friend GROUP BY 1)
+
+4. SELECT COUNT(ID1) FROM 
+   (SELECT distinct Friend.ID1 FROM Friend, (SELECT distinct ID1 FROM Friend F1
+   WHERE F1.ID1 = 1709 or F1.ID2 = 1709) list WHERE Friend.ID1 = list.ID1 or Friend.ID2 = list.ID1) R
+   WHERE ID1 <> 1709
+
+5. SELECT name, grade FROM Highschooler h, Friend f WHERE h.ID = f.ID1
+   GROUP BY 1 HAVING COUNT(f.ID2) = 
+   (SELECT MAX(f) FROM (SELECT ID1, COUNT(ID2) as f FROM Friend GROUP BY 1))

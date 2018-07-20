@@ -1,0 +1,42 @@
+SQL Social-Network Query Exercises
+
+1. SELECT h.name FROM Highschooler h
+   JOIN (SELECT ID2 FROM Friend WHERE ID1 IN (SELECT ID FROM Highschooler WHERE name = 'Gabriel')) AS temp
+   ON h.ID = temp.ID2
+
+2. SELECT t1.name, t1.grade, t2.name, t2.grade
+   FROM (SELECT * FROM Highschooler h, Likes l WHERE h.ID = l.ID1) AS t1
+   JOIN (SELECT * FROM Highschooler h, Likes l WHERE h.ID = l.ID2) AS t2
+   ON t1.ID1 = t2.ID1 AND t1.ID2 = t2.ID2 AND t1.grade - t2.grade >=2
+
+3. SELECT t1.name, t1.grade, t2.name, t2.grade
+   FROM (SELECT * FROM Highschooler h, Likes l WHERE h.ID = l.ID1) AS t1
+   JOIN (SELECT * FROM Highschooler h, Likes l WHERE h.ID = l.ID1) AS t2
+   ON t1.ID1 = t2.ID2 AND t1.ID2 = t2.ID1 AND t1.name < t2.name
+   ORDER BY 1
+
+4. SELECT name, grade FROM Highschooler
+   WHERE ID NOT IN (SELECT ID1 FROM Likes UNION SELECT ID2 FROM Likes)
+   ORDER BY 2, 1
+
+5. SELECT h1.name, h1.grade, h2.name, h2.grade
+   FROM Highschooler h1, Highschooler h2,Likes l
+   ON h1.ID = l.ID1 AND h2.ID = l.ID2 AND l.ID2 NOT IN (SELECT ID1 FROM Likes)
+
+6. SELECT name, grade
+   FROM Highschooler
+   WHERE ID NOT IN
+   (SELECT h1.ID FROM Highschooler h1, Highschooler h2, Friend f 
+   WHERE h1.ID = f.ID1 AND h2.ID = f.ID2 and h1.grade <> h2.grade)
+   ORDER BY 2, 1
+
+7. SELECT DISTINCT h1.name, h1.grade, h2.name, h2.grade, h3.name, h3.grade
+   FROM Highschooler h1, Highschooler h2, Highschooler h3, Likes l, Friend f1, Friend f2, Friend f3
+   WHERE h1.ID = l.ID1 AND h2.ID = l.ID2 AND f1.ID1 = h1.ID AND f1.ID2 = h3.ID
+   AND h3.ID = f2.ID1 AND h2.ID = f2.ID2 AND h1.ID = f3.ID1 AND h2.ID NOT IN 
+   (SELECT ID2 FROM Friend WHERE h1.ID = Friend.ID1)
+
+8. SELECT COUNT(*) - COUNT(DISTINCT name) FROM Highschooler
+
+9. SELECT name, grade FROM Highschooler WHERE ID IN
+   (SELECT ID2 FROM Likes GROUP BY ID2 HAVING COUNT(ID2) > 1) 
