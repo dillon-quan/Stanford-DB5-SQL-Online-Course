@@ -1,22 +1,44 @@
 SQL Social-Network Query Exercises Extra
 
-1. SELECT H1.name, H1.grade, H2.name, H2.grade, H3.name, H3.grade
+Tables:
+
+Highschooler ( ID, name, grade ) 
+English: There is a high school student with unique ID and a given first name in a certain grade. 
+
+Friend ( ID1, ID2 ) 
+English: The student with ID1 is friends with the student with ID2. Friendship is mutual, so if (123, 456) is in the Friend table, so is (456, 123). 
+
+Likes ( ID1, ID2 ) 
+English: The student with ID1 likes the student with ID2. Liking someone is not necessarily mutual, so if (123, 456) is in the Likes table, there is no guarantee that (456, 123) is also present. 
+
+
+1. For every situation where student A likes student B, but student B likes a different student C, return the names and grades    of A, B, and C. 
+
+   SELECT H1.name, H1.grade, H2.name, H2.grade, H3.name, H3.grade
    FROM Highschooler H1, Highschooler H2, Highschooler H3,(SELECT L1.ID1 as c1, L2.ID1, L2.ID2
    FROM Likes L1, Likes L2 WHERE L1.ID2 = L2.ID1 and L1.ID1 <> L2.ID2) list
    WHERE H1.ID = list.c1 and H2.ID = list.ID1 and H3.ID = list.ID2
 
-2. SELECT name, grade FROM Highschooler, (SELECT ID FROM Highschooler 
+2. Find those students for whom all of their friends are in different grades from themselves. Return the students' names and      grades. 
+
+   SELECT name, grade FROM Highschooler, (SELECT ID FROM Highschooler 
    WHERE ID NOT IN (SELECT distinct   H1.ID FROM Highschooler H1, Highschooler H2, Friend F1
    WHERE F1.ID1 = H1.ID and F1.ID2 = H2.ID and H1.grade = H2.grade)) list
    WHERE Highschooler.ID = list.ID
 
-3. SELECT AVG(counter) FROM (SELECT ID1, COUNT(ID1) as counter FROM Friend GROUP BY 1)
+3. What is the average number of friends per student? (Your result should be just one number.) 
 
-4. SELECT COUNT(ID1) FROM 
+   SELECT AVG(counter) FROM (SELECT ID1, COUNT(ID1) as counter FROM Friend GROUP BY 1)
+
+4. Find the number of students who are either friends with Cassandra or are friends of friends of Cassandra. Do not count        Cassandra, even though technically she is a friend of a friend.
+
+   SELECT COUNT(ID1) FROM 
    (SELECT distinct Friend.ID1 FROM Friend, (SELECT distinct ID1 FROM Friend F1
    WHERE F1.ID1 = 1709 or F1.ID2 = 1709) list WHERE Friend.ID1 = list.ID1 or Friend.ID2 = list.ID1) R
    WHERE ID1 <> 1709
 
-5. SELECT name, grade FROM Highschooler h, Friend f WHERE h.ID = f.ID1
+5. Find the name and grade of the student(s) with the greatest number of friends. 
+
+   SELECT name, grade FROM Highschooler h, Friend f WHERE h.ID = f.ID1
    GROUP BY 1 HAVING COUNT(f.ID2) = 
    (SELECT MAX(f) FROM (SELECT ID1, COUNT(ID2) as f FROM Friend GROUP BY 1))
