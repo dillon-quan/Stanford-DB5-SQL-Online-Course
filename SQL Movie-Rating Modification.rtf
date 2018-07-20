@@ -1,0 +1,26 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf400
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\ri0\partightenfactor0
+
+\f0\fs24 \cf0 SQL Movie-Rating Modification\
+\
+1.INSERT INTO Reviewer VALUES(209, 'Roger Ebert')\
+\
+2. INSERT INTO Rating (rID, mID, stars, ratingDate)\
+    SELECT Reviewer.riD, Movie.mID, 5, NULL FROM Movie\
+    LEFT OUTER JOIN Reviewer\
+    ON Reviewer.name = 'James Cameron'\
+\
+3. UPDATE Movie\
+    SET year = year + 25\
+    WHERE mID IN\
+    (SELECT mID FROM Rating GROUP BY mID HAVING AVG(stars) >= 4)\
+\
+4. DELETE FROM Rating WHERE mID IN\
+    (SELECT mID FROM Movie WHERE year < 1970 or year > 2000)\
+     and stars < 4\
+}
